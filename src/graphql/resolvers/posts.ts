@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server";
+import { AuthenticationError, UserInputError } from 'apollo-server';
 import { Document, Types } from "mongoose";
 import Posts from "../../model/Posts";
 import { IPosts } from "../../types/types";
@@ -6,7 +6,8 @@ import verify from "../../utils/verify"
 
 export = {
   Query: {
-    async getPosts() {
+    async getPosts(_: any, __: any, context: any) {
+      const user: any = verify(context);
       try {
         const posts: any = await Posts.find().sort({ createdAt: -1 });
         return posts;
@@ -14,7 +15,8 @@ export = {
         throw new Error(error);
       }
     },
-    async getPost(_: any, { postId }: any) {
+    async getPost(_: any, { postId }: any, context: any) {
+      const user: any = verify(context);
       try {
         const post = await Posts.findById(postId);
         if (!post) {
@@ -45,6 +47,23 @@ export = {
       })
 
       return post;
+    },
+    async updatePost(_: any, {postId, body}: any, context: any) {
+      const user : any = verify(context)
+      try{
+        if(body.trim() === '') {
+          return 'no updates was made'
+        }
+        const post: any = await Posts.findById(postId)
+        if (user.username === post.username){
+
+          const updatedPost = await Posts.findByIdAndUpdate(postId, {body}, {runValidators: true, new: true})
+          return updatedPost
+        }
+        throw new AuthenticationError("Action not allowed");
+      }catch(err: any) {
+        throw new Error(err)
+      }
     },
     async deletePost(_: any, { postId }: any, context: any) {
       const user: any = verify(context);

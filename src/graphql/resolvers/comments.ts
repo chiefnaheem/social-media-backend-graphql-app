@@ -29,9 +29,12 @@ export = {
         deleteComment: async (_: any, {postId, commentId}: any, context: any)=> {
             const {username}: any = verify(context)
 
+            // console.log("my logged in data please check", username)
             const post: any = await Posts.findById(postId)
             if(post){
                 const commentIndex: any = post.comments.findIndex((c: { id: any }) => c.id === commentId)
+                console.log("my logged in data please check", post.comments[commentIndex].username)
+
                 if(post.comments[commentIndex].username === username) {
                     post.comments.splice(commentIndex, 1)
                     await post.save()

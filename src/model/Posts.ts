@@ -22,6 +22,9 @@ const postSchema = new Schema <IPosts>({
         type: Schema.Types.ObjectId,
         ref: "Users"
     }
-})
+}, {
+    timestamps: true
+   }
+)
 const Posts = model<IPosts>('Posts', postSchema)
 export default Posts;

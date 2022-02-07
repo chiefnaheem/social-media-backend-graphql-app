@@ -13,6 +13,8 @@ const userSchema = new Schema <IUsers>({
         }
     },
     createdAt: String
+}, {
+    timestamps: true
 })
 
 const Users = model<IUsers>('Users', userSchema)
